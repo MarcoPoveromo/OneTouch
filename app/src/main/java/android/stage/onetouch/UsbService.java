@@ -142,6 +142,9 @@ public class UsbService extends Service {
         UsbService.SERVICE_CONNECTED = false;
     }
 
+    public void write(String data){
+        write(data.getBytes());
+    }
     public void write(byte[] data) {
         if (serialPort != null)
             serialPort.write(data);

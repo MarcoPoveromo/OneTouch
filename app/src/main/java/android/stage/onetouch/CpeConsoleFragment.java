@@ -52,7 +52,7 @@ public class CpeConsoleFragment extends Fragment {
     private UsbService usbService;
     private TextView display;
     private EditText editText;
-    private MyHandler mHandler;
+    private CpeConsoleFragment.MyHandler mHandler;
 
     private final ServiceConnection usbConnection = new ServiceConnection() {
         @Override
