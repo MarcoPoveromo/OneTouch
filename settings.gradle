@@ -1,0 +1,2 @@
+rootProject.name='OneTouch'
+include ':app'
