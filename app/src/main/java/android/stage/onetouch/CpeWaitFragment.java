@@ -25,28 +25,41 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static android.stage.onetouch.UsbService.ACTION_USB_PERMISSION_GRANTED;
+
 public class CpeWaitFragment extends Fragment {
     private static final String NEWLINE = "\n";
-    //TODO Estrarre il broadcastReceiver e gli altri metodi ripetuti
+    private static final String FINGERPRINT_ACCEPT = "android.stage.onetouch.FINGERPRINT_ACCEPT";
+    private static final String FINGERPRINT_REJECT = "android.stage.onetouch.FINGERPRINT_REJECT";
+
     private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
-                case UsbService.ACTION_USB_PERMISSION_GRANTED:
-                    Toast.makeText(context, "USB Ready", Toast.LENGTH_SHORT).show();
-                    new Thread(){@Override public void run(){cpeFingerprint();}}.start();
+                case ACTION_USB_PERMISSION_GRANTED:
+                    Toast.makeText(context, "USB: Permessi concessi", Toast.LENGTH_SHORT).show();
                     break;
                 case UsbService.ACTION_USB_PERMISSION_NOT_GRANTED:
-                    Toast.makeText(context, "USB Permission not granted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "USB: Permessi non concessi", Toast.LENGTH_SHORT).show();
+                    break;
+                case UsbService.ACTION_USB_READY:
+                    Toast.makeText(context, "USB: Connessione al dispositivo riuscita", Toast.LENGTH_SHORT).show();
+                    new Thread(){@Override public void run(){cpeFingerprint();}}.start();
                     break;
                 case UsbService.ACTION_NO_USB:
-                    Toast.makeText(context, "No USB connected", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "USB: Nessun dispositivo connesso", Toast.LENGTH_SHORT).show();
                     break;
                 case UsbService.ACTION_USB_DISCONNECTED:
-                    Toast.makeText(context, "USB disconnected", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "USB: Disconnesso", Toast.LENGTH_SHORT).show();
                     break;
                 case UsbService.ACTION_USB_NOT_SUPPORTED:
-                    Toast.makeText(context, "USB device not supported", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "USB: Adattatore non supportato", Toast.LENGTH_SHORT).show();
+                    break;
+                case CpeWaitFragment.FINGERPRINT_ACCEPT:
+                    Toast.makeText(context, "CPE: Riconosciuto " + mCpeInfo.toString(), Toast.LENGTH_LONG).show();
+                    break;
+                case CpeWaitFragment.FINGERPRINT_REJECT:
+                    Toast.makeText(context, "CPE: Non riconosciuto", Toast.LENGTH_LONG).show();
                     break;
             }
         }
@@ -94,7 +107,19 @@ public class CpeWaitFragment extends Fragment {
                 e.printStackTrace();
             }
             searchDeviceSerialNumber("DEVICE_SERIAL_NUMBER\\s+:\\s+(\\w+)", lastOutput);*/
-            mCpeInfo = cpeInfo;
+
+            //Questo è l'oggetto che dovrebbe arrivare dal database
+            mCpeInfo = new CpeInfo();
+            mCpeInfo.setVendorName("Huawei");
+            mCpeInfo.setModel("QUIDWAY AR1915 ");
+
+            if(cpeInfo.equals(mCpeInfo)) {
+                Intent intent = new Intent(FINGERPRINT_ACCEPT);
+                getActivity().sendBroadcast(intent);
+            }else{
+                Intent intent = new Intent(FINGERPRINT_REJECT);
+                getActivity().sendBroadcast(intent);
+            }
     }
 
     private String searchModel(String s, String lastOutput) {
@@ -115,6 +140,7 @@ public class CpeWaitFragment extends Fragment {
             return matcher.group();
         return null;
     }
+
     private final ServiceConnection usbConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName arg0, IBinder arg1) {
@@ -130,11 +156,14 @@ public class CpeWaitFragment extends Fragment {
 
     private void setFilters() {
         IntentFilter filter = new IntentFilter();
-        filter.addAction(UsbService.ACTION_USB_PERMISSION_GRANTED);
+        filter.addAction(ACTION_USB_PERMISSION_GRANTED);
         filter.addAction(UsbService.ACTION_NO_USB);
         filter.addAction(UsbService.ACTION_USB_DISCONNECTED);
         filter.addAction(UsbService.ACTION_USB_NOT_SUPPORTED);
         filter.addAction(UsbService.ACTION_USB_PERMISSION_NOT_GRANTED);
+        filter.addAction(UsbService.ACTION_USB_READY);
+        filter.addAction(FINGERPRINT_ACCEPT);
+        filter.addAction(FINGERPRINT_REJECT);
         getActivity().registerReceiver(mUsbReceiver, filter);
     }
 
