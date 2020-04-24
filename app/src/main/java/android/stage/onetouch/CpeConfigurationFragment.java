@@ -63,7 +63,6 @@ public class CpeConfigurationFragment extends Fragment {
         public void onServiceConnected(ComponentName arg0, IBinder arg1) {
             usbService = ((UsbService.UsbBinder) arg1).getService();
             usbService.setHandler(mHandler);
-
             new Thread(){@Override public void run(){applicaConfigurazione();}}.start();
 
         }
