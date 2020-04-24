@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">OneTouch</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="applica_configurazione">Applica configurazione</string>
+    <string name="installa_firmware">Installa firmware</string>
+    <string name="applica_patch">Applica patch</string>
+    <string name="vendor">Vendor:</string>
+    <string name="model">Model:</string>
+    <string name="apri_la_console">Apri la console</string>
 </resources>

@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static android.stage.onetouch.UsbService.ACTION_USB_PERMISSION_GRANTED;
 
 public class CpeWaitFragment extends Fragment {
     private static final String NEWLINE = "\n";
@@ -36,7 +35,7 @@ public class CpeWaitFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
-                case ACTION_USB_PERMISSION_GRANTED:
+                case UsbService.ACTION_USB_PERMISSION_GRANTED:
                     Toast.makeText(context, "USB: Permessi concessi", Toast.LENGTH_SHORT).show();
                     break;
                 case UsbService.ACTION_USB_PERMISSION_NOT_GRANTED:
@@ -57,6 +56,11 @@ public class CpeWaitFragment extends Fragment {
                     break;
                 case CpeWaitFragment.FINGERPRINT_ACCEPT:
                     Toast.makeText(context, "CPE: Riconosciuto " + mCpeInfo.toString(), Toast.LENGTH_LONG).show();
+                    CpeMenuFragment nextFrag= new CpeMenuFragment();
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, nextFrag, "CpeWaitFragment")
+                            .addToBackStack(null)
+                            .commit(); 
                     break;
                 case CpeWaitFragment.FINGERPRINT_REJECT:
                     Toast.makeText(context, "CPE: Non riconosciuto", Toast.LENGTH_LONG).show();
@@ -156,7 +160,7 @@ public class CpeWaitFragment extends Fragment {
 
     private void setFilters() {
         IntentFilter filter = new IntentFilter();
-        filter.addAction(ACTION_USB_PERMISSION_GRANTED);
+        filter.addAction(UsbService.ACTION_USB_PERMISSION_GRANTED);
         filter.addAction(UsbService.ACTION_NO_USB);
         filter.addAction(UsbService.ACTION_USB_DISCONNECTED);
         filter.addAction(UsbService.ACTION_USB_NOT_SUPPORTED);
