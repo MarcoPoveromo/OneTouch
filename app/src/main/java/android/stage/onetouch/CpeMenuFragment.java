@@ -10,6 +10,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
@@ -53,7 +54,7 @@ public class CpeMenuFragment extends Fragment {
     private CpeMenuFragment.MyHandler mHandler;
 
     Button mButtonApriConsole;
-    Button mButtonConfiguration;
+    CardView configurationCard;
 
     private final ServiceConnection usbConnection = new ServiceConnection() {
         @Override
@@ -143,6 +144,8 @@ public class CpeMenuFragment extends Fragment {
         View v = inflater.inflate(R.layout.cpe_menu_fragment, container, false);
         mHandler = new MyHandler(CpeMenuFragment.this);
 
+
+
         mButtonApriConsole = (Button) v.findViewById(R.id.button8);
         mButtonApriConsole.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,8 +157,8 @@ public class CpeMenuFragment extends Fragment {
                         .commit();
             }
         });
-        mButtonConfiguration = (Button) v.findViewById(R.id.button3);
-        mButtonConfiguration.setOnClickListener(new View.OnClickListener() {
+        configurationCard = (CardView) v.findViewById(R.id.cardView2);
+        configurationCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 CpeConfigurationFragment nextFrag= new CpeConfigurationFragment();
@@ -165,7 +168,6 @@ public class CpeMenuFragment extends Fragment {
                         .commit();
             }
         });
-
 
         return v;
     }

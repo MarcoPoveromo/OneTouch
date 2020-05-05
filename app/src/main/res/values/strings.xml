@@ -9,4 +9,11 @@
     <string name="vendor">Vendor:</string>
     <string name="model">Model:</string>
     <string name="apri_la_console">Apri la console</string>
+    <string name="in_attesa_del_collegamento">In attesa del collegamento</string>
+    <string name="huawei">Huawei</string>
+    <string name="vendor_card">Vendor</string>
+    <string name="model_card">Model</string>
+    <string name="ar_19_15">AR 19-15</string>
+    <string name="men">Menù</string>
+    <string name="applica_firmware">Applica firmware</string>
 </resources>

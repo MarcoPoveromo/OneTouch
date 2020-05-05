@@ -148,7 +148,7 @@ public class CpeWaitFragment extends Fragment {
     private final ServiceConnection usbConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName arg0, IBinder arg1) {
-            usbService = ((UsbService.UsbBinder) arg1).getService();
+            usbService = ( (UsbService.UsbBinder) arg1).getService();
             usbService.setHandler(mHandler);
         }
 
