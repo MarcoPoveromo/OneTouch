@@ -28,8 +28,6 @@ import java.util.regex.Pattern;
 
 public class CpeWaitFragment extends Fragment {
     private static final String NEWLINE = "\n";
-    private static final String FINGERPRINT_ACCEPT = "android.stage.onetouch.FINGERPRINT_ACCEPT";
-    private static final String FINGERPRINT_REJECT = "android.stage.onetouch.FINGERPRINT_REJECT";
 
     private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         @Override
@@ -54,17 +52,16 @@ public class CpeWaitFragment extends Fragment {
                 case UsbService.ACTION_USB_NOT_SUPPORTED:
                     Toast.makeText(context, "USB: Adattatore non supportato", Toast.LENGTH_SHORT).show();
                     break;
-                case CpeWaitFragment.FINGERPRINT_ACCEPT:
-                    Toast.makeText(context, "CPE: Riconosciuto " + mCpeInfo.toString(), Toast.LENGTH_LONG).show();
+                case UsbService.FINGERPRINT_ACCEPT:
+                    Toast.makeText(getActivity(), "CPE: Riconosciuto " + mCpeInfo.toString(), Toast.LENGTH_SHORT).show();
                     CpeMenuFragment nextFrag= new CpeMenuFragment();
                     getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, nextFrag, "CpeWaitFragment")
                             .addToBackStack(null)
-                            .commit(); 
+                            .commit();
                     break;
-                case CpeWaitFragment.FINGERPRINT_REJECT:
-                    Toast.makeText(context, "CPE: Non riconosciuto", Toast.LENGTH_LONG).show();
-                    break;
+                case UsbService.FINGERPRINT_REJECT:
+                    Toast.makeText(getContext(), "CPE: Cpe non Riconosciuto", Toast.LENGTH_LONG).show();
             }
         }
     };
@@ -117,11 +114,11 @@ public class CpeWaitFragment extends Fragment {
             mCpeInfo.setVendorName("Huawei");
             mCpeInfo.setModel("QUIDWAY AR1915 ");
 
-            if(cpeInfo.equals(mCpeInfo)) {
-                Intent intent = new Intent(FINGERPRINT_ACCEPT);
+            if(cpeInfo.equals(mCpeInfo)){
+                Intent intent = new Intent(UsbService.FINGERPRINT_ACCEPT);
                 getActivity().sendBroadcast(intent);
             }else{
-                Intent intent = new Intent(FINGERPRINT_REJECT);
+                Intent intent = new Intent(UsbService.FINGERPRINT_REJECT);
                 getActivity().sendBroadcast(intent);
             }
     }
@@ -145,19 +142,6 @@ public class CpeWaitFragment extends Fragment {
         return null;
     }
 
-    private final ServiceConnection usbConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName arg0, IBinder arg1) {
-            usbService = ( (UsbService.UsbBinder) arg1).getService();
-            usbService.setHandler(mHandler);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            usbService = null;
-        }
-    };
-
     private void setFilters() {
         IntentFilter filter = new IntentFilter();
         filter.addAction(UsbService.ACTION_USB_PERMISSION_GRANTED);
@@ -166,40 +150,22 @@ public class CpeWaitFragment extends Fragment {
         filter.addAction(UsbService.ACTION_USB_NOT_SUPPORTED);
         filter.addAction(UsbService.ACTION_USB_PERMISSION_NOT_GRANTED);
         filter.addAction(UsbService.ACTION_USB_READY);
-        filter.addAction(FINGERPRINT_ACCEPT);
-        filter.addAction(FINGERPRINT_REJECT);
+        filter.addAction(UsbService.FINGERPRINT_ACCEPT);
+        filter.addAction(UsbService.FINGERPRINT_REJECT);
         getActivity().registerReceiver(mUsbReceiver, filter);
-    }
-
-
-    private void startService(Class<?> service, ServiceConnection serviceConnection, Bundle extras) {
-        if (!UsbService.SERVICE_CONNECTED) {
-            Intent startService = new Intent(getActivity(), service);
-            if (extras != null && !extras.isEmpty()) {
-                Set<String> keys = extras.keySet();
-                for (String key : keys) {
-                    String extra = extras.getString(key);
-                    startService.putExtra(key, extra);
-                }
-            }
-            getActivity().startService(startService);
-        }
-        Intent bindingIntent = new Intent(getActivity(), service);
-        getActivity().bindService(bindingIntent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        setFilters();  // Start listening notifications from UsbService
-        startService(UsbService.class, usbConnection, null); // Start UsbService(if it was not started before) and Bind it
+        setFilters();
+        usbService = ((CpeActivity) getActivity()).getUsbService();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         getActivity().unregisterReceiver(mUsbReceiver);
-        getActivity().unbindService(usbConnection);
     }
 
     @Override
@@ -212,6 +178,7 @@ public class CpeWaitFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.cpe_wait_fragment, container, false);
         mHandler = new CpeWaitFragment.MyHandler(CpeWaitFragment.this);
+        ((CpeActivity) getActivity()).setServiceHandler(mHandler);
         return v;
     }
 

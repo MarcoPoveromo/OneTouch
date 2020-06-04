@@ -1,12 +1,9 @@
 package android.stage.onetouch;
 
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,40 +11,29 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
-import android.os.IBinder;
-import android.os.Looper;
 import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
-import java.util.Set;
 
 public class CpeConfigurationFragment extends Fragment {
     private static final String NEWLINE = "\n";
+
     private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
-                case UsbService.ACTION_USB_PERMISSION_GRANTED:
-                    Toast.makeText(context, "USB Ready", Toast.LENGTH_SHORT).show();
-                    break;
-                case UsbService.ACTION_USB_PERMISSION_NOT_GRANTED:
-                    Toast.makeText(context, "USB Permission not granted", Toast.LENGTH_SHORT).show();
-                    break;
-                case UsbService.ACTION_NO_USB:
-                    Toast.makeText(context, "No USB connected", Toast.LENGTH_SHORT).show();
-                    break;
                 case UsbService.ACTION_USB_DISCONNECTED:
                     Toast.makeText(context, "USB disconnected", Toast.LENGTH_SHORT).show();
-                    break;
-                case UsbService.ACTION_USB_NOT_SUPPORTED:
-                    Toast.makeText(context, "USB device not supported", Toast.LENGTH_SHORT).show();
+                    CpeWaitFragment nextFrag= new CpeWaitFragment();
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, nextFrag, "CpeConfigurationFragment")
+                            .addToBackStack(null)
+                            .commit();
                     break;
             }
         }
@@ -57,45 +43,9 @@ public class CpeConfigurationFragment extends Fragment {
     private TextView display;
     private CpeConfigurationFragment.MyHandler mHandler;
 
-
-    private final ServiceConnection usbConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName arg0, IBinder arg1) {
-            usbService = ((UsbService.UsbBinder) arg1).getService();
-            usbService.setHandler(mHandler);
-            new Thread(){@Override public void run(){applicaConfigurazione();}}.start();
-
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            usbService = null;
-        }
-    };
-
-    private void startService(Class<?> service, ServiceConnection serviceConnection, Bundle extras) {
-        if (!UsbService.SERVICE_CONNECTED) {
-            Intent startService = new Intent(getActivity(), service);
-            if (extras != null && !extras.isEmpty()) {
-                Set<String> keys = extras.keySet();
-                for (String key : keys) {
-                    String extra = extras.getString(key);
-                    startService.putExtra(key, extra);
-                }
-            }
-            getActivity().startService(startService);
-        }
-        Intent bindingIntent = new Intent(getActivity(), service);
-        getActivity().bindService(bindingIntent, serviceConnection, Context.BIND_AUTO_CREATE);
-    }
-
     private void setFilters() {
         IntentFilter filter = new IntentFilter();
-        filter.addAction(UsbService.ACTION_USB_PERMISSION_GRANTED);
-        filter.addAction(UsbService.ACTION_NO_USB);
         filter.addAction(UsbService.ACTION_USB_DISCONNECTED);
-        filter.addAction(UsbService.ACTION_USB_NOT_SUPPORTED);
-        filter.addAction(UsbService.ACTION_USB_PERMISSION_NOT_GRANTED);
         getActivity().registerReceiver(mUsbReceiver, filter);
     }
 
@@ -127,16 +77,15 @@ public class CpeConfigurationFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        setFilters();  // Start listening notifications from UsbService
-        startService(UsbService.class, usbConnection, null); // Start UsbService(if it was not started before) and Bind it
-
+        setFilters();
+        usbService = ((CpeActivity) getActivity()).getUsbService();
+        applicaConfigurazione();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         getActivity().unregisterReceiver(mUsbReceiver);
-        getActivity().unbindService(usbConnection);
     }
 
     @Override
@@ -149,15 +98,18 @@ public class CpeConfigurationFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_cpe_configuration, container, false);
         mHandler = new CpeConfigurationFragment.MyHandler(CpeConfigurationFragment.this);
+        ((CpeActivity) getActivity()).setServiceHandler(mHandler);
 
         display = (TextView) v.findViewById(R.id.textView);
         return v;
     }
 
     private void applicaConfigurazione(){
-
-        for(int i = 0; i < 20; i++) {
-            usbService.write("display version\n" + NEWLINE);
-        }
+          usbService.write("system-view" + NEWLINE);
+          usbService.write("user-interface aux 0" + NEWLINE);
+          usbService.write("screen-length 0" + NEWLINE);
+          usbService.write("display version" + NEWLINE);
+          usbService.write("display cpu" + NEWLINE);
+          usbService.write("display current-configuration" + NEWLINE);
     }
 }

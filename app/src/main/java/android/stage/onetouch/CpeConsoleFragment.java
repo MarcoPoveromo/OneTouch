@@ -11,8 +11,12 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -26,24 +30,19 @@ import java.lang.ref.WeakReference;
 import java.util.Set;
 
 public class CpeConsoleFragment extends Fragment {
+    private static final String CTRL_B = "\u0002";
+    private static final String CTRL_M = "\u0013";
     private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
-                case UsbService.ACTION_USB_PERMISSION_GRANTED:
-                    Toast.makeText(context, "USB Ready", Toast.LENGTH_SHORT).show();
-                    break;
-                case UsbService.ACTION_USB_PERMISSION_NOT_GRANTED:
-                    Toast.makeText(context, "USB Permission not granted", Toast.LENGTH_SHORT).show();
-                    break;
-                case UsbService.ACTION_NO_USB:
-                    Toast.makeText(context, "No USB connected", Toast.LENGTH_SHORT).show();
-                    break;
                 case UsbService.ACTION_USB_DISCONNECTED:
                     Toast.makeText(context, "USB disconnected", Toast.LENGTH_SHORT).show();
-                    break;
-                case UsbService.ACTION_USB_NOT_SUPPORTED:
-                    Toast.makeText(context, "USB device not supported", Toast.LENGTH_SHORT).show();
+                    CpeWaitFragment nextFrag= new CpeWaitFragment();
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, nextFrag, "CpeConsoleFragment")
+                            .addToBackStack(null)
+                            .commit();
                     break;
             }
         }
@@ -52,44 +51,14 @@ public class CpeConsoleFragment extends Fragment {
     private UsbService usbService;
     private TextView display;
     private EditText editText;
+    private Button mButtonCtrlE;
+    private Button mButtonCtrlM;
     private CpeConsoleFragment.MyHandler mHandler;
 
-    private final ServiceConnection usbConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName arg0, IBinder arg1) {
-            usbService = ((UsbService.UsbBinder) arg1).getService();
-            usbService.setHandler(mHandler);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            usbService = null;
-        }
-    };
-
-    private void startService(Class<?> service, ServiceConnection serviceConnection, Bundle extras) {
-        if (!UsbService.SERVICE_CONNECTED) {
-            Intent startService = new Intent(getActivity(), service);
-            if (extras != null && !extras.isEmpty()) {
-                Set<String> keys = extras.keySet();
-                for (String key : keys) {
-                    String extra = extras.getString(key);
-                    startService.putExtra(key, extra);
-                }
-            }
-            getActivity().startService(startService);
-        }
-        Intent bindingIntent = new Intent(getActivity(), service);
-        getActivity().bindService(bindingIntent, serviceConnection, Context.BIND_AUTO_CREATE);
-    }
 
     private void setFilters() {
         IntentFilter filter = new IntentFilter();
-        filter.addAction(UsbService.ACTION_USB_PERMISSION_GRANTED);
-        filter.addAction(UsbService.ACTION_NO_USB);
         filter.addAction(UsbService.ACTION_USB_DISCONNECTED);
-        filter.addAction(UsbService.ACTION_USB_NOT_SUPPORTED);
-        filter.addAction(UsbService.ACTION_USB_PERMISSION_NOT_GRANTED);
         getActivity().registerReceiver(mUsbReceiver, filter);
     }
 
@@ -122,14 +91,13 @@ public class CpeConsoleFragment extends Fragment {
     public void onResume() {
         super.onResume();
         setFilters();  // Start listening notifications from UsbService
-        startService(UsbService.class, usbConnection, null); // Start UsbService(if it was not started before) and Bind it
+        usbService = ((CpeActivity) getActivity()).getUsbService();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         getActivity().unregisterReceiver(mUsbReceiver);
-        getActivity().unbindService(usbConnection);
     }
 
     @Override
@@ -141,10 +109,14 @@ public class CpeConsoleFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.cpe_console_fragment, container, false);
+        setHasOptionsMenu(true);
         mHandler = new MyHandler(CpeConsoleFragment.this);
+        ((CpeActivity) getActivity()).setServiceHandler(mHandler);
 
         display = (TextView) v.findViewById(R.id.textView);
         editText = (EditText) v.findViewById(R.id.editText);
+        mButtonCtrlE = v.findViewById(R.id.button2);
+        mButtonCtrlM = v.findViewById(R.id.button3);
         ImageButton sendButton = (ImageButton) v.findViewById(R.id.button);
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,6 +128,30 @@ public class CpeConsoleFragment extends Fragment {
                 }
             }
         });
+        mButtonCtrlE.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editText.append(CTRL_B);
+            }
+        });
+        mButtonCtrlM.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editText.append(CTRL_M);
+            }
+        });
         return v;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        return super.onOptionsItemSelected(item);
     }
 }

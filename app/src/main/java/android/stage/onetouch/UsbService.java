@@ -26,6 +26,9 @@ public class UsbService extends Service {
 
     public static final String TAG = "UsbService";
 
+    public static final String FINGERPRINT_ACCEPT = "android.stage.onetouch.FINGERPRINT_ACCEPT";
+    public static final String FINGERPRINT_REJECT = "android.stage.onetouch.FINGERPRINT_REJECT";
+
     public static final String ACTION_USB_READY = "com.felhr.connectivityservices.USB_READY";
     public static final String ACTION_USB_ATTACHED = "android.hardware.usb.action.USB_DEVICE_ATTACHED";
     public static final String ACTION_USB_DETACHED = "android.hardware.usb.action.USB_DEVICE_DETACHED";
@@ -40,7 +43,7 @@ public class UsbService extends Service {
     public static final int CTS_CHANGE = 1;
     public static final int DSR_CHANGE = 2;
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
-    private static final int BAUD_RATE = 9600; // BaudRate. Change this value if you need
+    private static final int BAUD_RATE = 9600;
     public static boolean SERVICE_CONNECTED = false;
 
     private IBinder binder = new UsbBinder();
@@ -145,6 +148,7 @@ public class UsbService extends Service {
     public void write(String data){
         write(data.getBytes());
     }
+
     public void write(byte[] data) {
         if (serialPort != null)
             serialPort.write(data);
