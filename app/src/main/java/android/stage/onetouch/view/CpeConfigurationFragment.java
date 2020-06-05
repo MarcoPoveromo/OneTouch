@@ -1,37 +1,30 @@
-package android.stage.onetouch;
+package android.stage.onetouch.view;
 
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import java.lang.ref.WeakReference;
-import java.util.Set;
+import android.os.Handler;
+import android.os.Message;
+import android.stage.onetouch.R;
+import android.stage.onetouch.service.UsbService;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
-public class CpeConsoleFragment extends Fragment {
-    private static final String CTRL_B = "\u0002";
-    private static final String CTRL_M = "\u0013";
+import java.lang.ref.WeakReference;
+
+public class CpeConfigurationFragment extends Fragment {
+    private static final String NEWLINE = "\n";
+
     private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -40,7 +33,7 @@ public class CpeConsoleFragment extends Fragment {
                     Toast.makeText(context, "USB disconnected", Toast.LENGTH_SHORT).show();
                     CpeWaitFragment nextFrag= new CpeWaitFragment();
                     getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, nextFrag, "CpeConsoleFragment")
+                            .replace(R.id.fragment_container, nextFrag, "CpeConfigurationFragment")
                             .addToBackStack(null)
                             .commit();
                     break;
@@ -50,11 +43,7 @@ public class CpeConsoleFragment extends Fragment {
 
     private UsbService usbService;
     private TextView display;
-    private EditText editText;
-    private Button mButtonCtrlE;
-    private Button mButtonCtrlM;
-    private CpeConsoleFragment.MyHandler mHandler;
-
+    private CpeConfigurationFragment.MyHandler mHandler;
 
     private void setFilters() {
         IntentFilter filter = new IntentFilter();
@@ -64,10 +53,10 @@ public class CpeConsoleFragment extends Fragment {
 
 
     private static class MyHandler extends Handler {
-        private final WeakReference<CpeConsoleFragment> mFragment;
+        private final WeakReference<CpeConfigurationFragment> mFragment;
 
         public MyHandler(Fragment fragment) {
-            mFragment = new WeakReference<CpeConsoleFragment>((CpeConsoleFragment) fragment);
+            mFragment = new WeakReference<CpeConfigurationFragment>((CpeConfigurationFragment) fragment);
         }
 
         @Override
@@ -90,8 +79,9 @@ public class CpeConsoleFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        setFilters();  // Start listening notifications from UsbService
+        setFilters();
         usbService = ((CpeActivity) getActivity()).getUsbService();
+        applicaConfigurazione();
     }
 
     @Override
@@ -108,50 +98,20 @@ public class CpeConsoleFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.cpe_console_fragment, container, false);
-        setHasOptionsMenu(true);
-        mHandler = new MyHandler(CpeConsoleFragment.this);
+        View v = inflater.inflate(R.layout.fragment_cpe_configuration, container, false);
+        mHandler = new CpeConfigurationFragment.MyHandler(CpeConfigurationFragment.this);
         ((CpeActivity) getActivity()).setServiceHandler(mHandler);
 
         display = (TextView) v.findViewById(R.id.textView);
-        editText = (EditText) v.findViewById(R.id.editText);
-        mButtonCtrlE = v.findViewById(R.id.button2);
-        mButtonCtrlM = v.findViewById(R.id.button3);
-        ImageButton sendButton = (ImageButton) v.findViewById(R.id.button);
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String data = editText.getText().toString() + "\n";
-                editText.setText("");
-                if (usbService != null) { // if UsbService was correctly binded, Send data
-                    usbService.write(data.getBytes());
-                }
-            }
-        });
-        mButtonCtrlE.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.append(CTRL_B);
-            }
-        });
-        mButtonCtrlM.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.append(CTRL_M);
-            }
-        });
         return v;
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        return super.onOptionsItemSelected(item);
+    private void applicaConfigurazione(){
+          usbService.write("system-view" + NEWLINE);
+          usbService.write("user-interface aux 0" + NEWLINE);
+          usbService.write("screen-length 0" + NEWLINE);
+          usbService.write("display version" + NEWLINE);
+          usbService.write("display cpu" + NEWLINE);
+          usbService.write("display current-configuration" + NEWLINE);
     }
 }

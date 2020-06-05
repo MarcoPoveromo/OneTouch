@@ -1,4 +1,4 @@
-package android.stage.onetouch;
+package android.stage.onetouch.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -10,6 +10,9 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.stage.onetouch.R;
+import android.stage.onetouch.service.UsbService;
+
 import java.util.Set;
 
 public class CpeActivity extends AppCompatActivity {

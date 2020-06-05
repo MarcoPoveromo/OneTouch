@@ -1,4 +1,4 @@
-package android.stage.onetouch;
+package android.stage.onetouch.model;
 
 import java.util.Objects;
 

@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="android.stage.onetouch">
-    <uses-feature android:name="android.hardware.usb.host"
-        android:required="true"/>
+
+    <uses-feature
+        android:name="android.hardware.usb.host"
+        android:required="true" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -10,15 +13,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".CpeActivity">
+        <activity android:name=".view.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".view.CpeActivity">
+        </activity>
+
         <service
-            android:name=".UsbService"
-            android:enabled="true">
-        </service>
+            android:name=".service.UsbService"
+            android:enabled="true"></service>
     </application>
+
 </manifest>

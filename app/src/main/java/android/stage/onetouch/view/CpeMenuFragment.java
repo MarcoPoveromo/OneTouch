@@ -1,11 +1,9 @@
-package android.stage.onetouch;
+package android.stage.onetouch.view;
 
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,17 +11,13 @@ import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
+import android.stage.onetouch.R;
+import android.stage.onetouch.service.UsbService;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
-
-import java.lang.ref.WeakReference;
-import java.util.Set;
 
 
 public class CpeMenuFragment extends Fragment {

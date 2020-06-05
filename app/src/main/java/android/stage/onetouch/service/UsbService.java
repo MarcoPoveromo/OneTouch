@@ -1,4 +1,4 @@
-package android.stage.onetouch;
+package android.stage.onetouch.service;
 
 import android.app.PendingIntent;
 import android.app.Service;
