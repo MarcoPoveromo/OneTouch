@@ -43,6 +43,7 @@ public class CpeMenuFragment extends Fragment {
 
     Button mButtonApriConsole;
     CardView configurationCard;
+    CardView consoleCard;
 
     private void setFilters() {
         IntentFilter filter = new IntentFilter();
@@ -72,9 +73,8 @@ public class CpeMenuFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.cpe_menu_fragment, container, false);
-
-        /*mButtonApriConsole = (Button) v.findViewById(R.id.button8);
-        mButtonApriConsole.setOnClickListener(new View.OnClickListener() {
+        consoleCard = v.findViewById(R.id.cardView5);
+        consoleCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 CpeConsoleFragment nextFrag= new CpeConsoleFragment();
@@ -83,7 +83,7 @@ public class CpeMenuFragment extends Fragment {
                         .addToBackStack(null)
                         .commit();
             }
-        });*/
+        });
         configurationCard = (CardView) v.findViewById(R.id.cardView2);
         configurationCard.setOnClickListener(new View.OnClickListener() {
             @Override

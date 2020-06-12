@@ -112,11 +112,8 @@ public class CpeConsoleFragment extends Fragment {
         setHasOptionsMenu(true);
         mHandler = new MyHandler(CpeConsoleFragment.this);
         ((CpeActivity) getActivity()).setServiceHandler(mHandler);
-
         display = (TextView) v.findViewById(R.id.textView);
         editText = (EditText) v.findViewById(R.id.editText);
-        mButtonCtrlE = v.findViewById(R.id.button2);
-        mButtonCtrlM = v.findViewById(R.id.button3);
         ImageButton sendButton = (ImageButton) v.findViewById(R.id.button);
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,18 +123,6 @@ public class CpeConsoleFragment extends Fragment {
                 if (usbService != null) {
                     usbService.write(data.getBytes());
                 }
-            }
-        });
-        mButtonCtrlE.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.append(CTRL_B);
-            }
-        });
-        mButtonCtrlM.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.append(CTRL_M);
             }
         });
         return v;
