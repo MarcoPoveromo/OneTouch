@@ -19,6 +19,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
+
 
 public class CpeMenuFragment extends Fragment {
     private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
@@ -26,7 +28,7 @@ public class CpeMenuFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case UsbService.ACTION_USB_DISCONNECTED:
-                    Toast.makeText(context, "USB disconnected", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(getView(), "USB disconnected", Snackbar.LENGTH_LONG).show();
                     CpeWaitFragment nextFrag= new CpeWaitFragment();
                     getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, nextFrag, "CpeMenuFragment")
@@ -71,7 +73,7 @@ public class CpeMenuFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.cpe_menu_fragment, container, false);
 
-        mButtonApriConsole = (Button) v.findViewById(R.id.button8);
+        /*mButtonApriConsole = (Button) v.findViewById(R.id.button8);
         mButtonApriConsole.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,7 +83,7 @@ public class CpeMenuFragment extends Fragment {
                         .addToBackStack(null)
                         .commit();
             }
-        });
+        });*/
         configurationCard = (CardView) v.findViewById(R.id.cardView2);
         configurationCard.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -20,6 +20,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import java.lang.ref.WeakReference;
 
 public class CpeConfigurationFragment extends Fragment {
@@ -30,7 +32,7 @@ public class CpeConfigurationFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case UsbService.ACTION_USB_DISCONNECTED:
-                    Toast.makeText(context, "USB disconnected", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(getView(), "USB disconnected", Snackbar.LENGTH_LONG).show();
                     CpeWaitFragment nextFrag= new CpeWaitFragment();
                     getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, nextFrag, "CpeConfigurationFragment")

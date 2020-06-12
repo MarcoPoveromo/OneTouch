@@ -20,6 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import java.lang.ref.WeakReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,26 +35,26 @@ public class CpeWaitFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case UsbService.ACTION_USB_PERMISSION_GRANTED:
-                    Toast.makeText(context, "USB: Permessi concessi", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(getView(), "USB: Permessi concessi", Snackbar.LENGTH_SHORT).show();
                     break;
                 case UsbService.ACTION_USB_PERMISSION_NOT_GRANTED:
-                    Toast.makeText(context, "USB: Permessi non concessi", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(getView(), "USB: Permessi non concessi", Snackbar.LENGTH_SHORT).show();
                     break;
                 case UsbService.ACTION_USB_READY:
-                    Toast.makeText(context, "USB: Connessione al dispositivo riuscita", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(getView(), "USB: Connessione al dispositivo riuscita", Snackbar.LENGTH_SHORT).show();
                     new Thread(){@Override public void run(){cpeFingerprint();}}.start();
                     break;
                 case UsbService.ACTION_NO_USB:
-                    Toast.makeText(context, "USB: Nessun dispositivo connesso", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(getView(), "USB: Nessun dispositivo connesso", Snackbar.LENGTH_SHORT).show();
                     break;
                 case UsbService.ACTION_USB_DISCONNECTED:
-                    Toast.makeText(context, "USB: Disconnesso", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(getView(), "USB: Disconnesso", Snackbar.LENGTH_SHORT).show();
                     break;
                 case UsbService.ACTION_USB_NOT_SUPPORTED:
-                    Toast.makeText(context, "USB: Adattatore non supportato", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(getView(), "USB: Adattatore non supportato", Snackbar.LENGTH_SHORT).show();
                     break;
                 case UsbService.FINGERPRINT_ACCEPT:
-                    Toast.makeText(getActivity(), "CPE: Riconosciuto " + mCpeInfo.toString(), Toast.LENGTH_SHORT).show();
+                    Snackbar.make(getView(), "CPE: Riconosciuto", Snackbar.LENGTH_SHORT).show();
                     CpeMenuFragment nextFrag= new CpeMenuFragment();
                     getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, nextFrag, "CpeWaitFragment")
@@ -60,7 +62,7 @@ public class CpeWaitFragment extends Fragment {
                             .commit();
                     break;
                 case UsbService.FINGERPRINT_REJECT:
-                    Toast.makeText(getContext(), "CPE: Cpe non Riconosciuto", Toast.LENGTH_LONG).show();
+                    Snackbar.make(getView(), "CPE: Cpe non Riconosciuto", Snackbar.LENGTH_SHORT).show();
             }
         }
     };

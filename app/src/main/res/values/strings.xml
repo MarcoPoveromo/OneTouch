@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">OneTouch</string>
+    <string name="app_name">OneTouch - Easy Provisioning</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -9,12 +9,12 @@
     <string name="vendor">Vendor:</string>
     <string name="model">Model:</string>
     <string name="apri_la_console">Apri la console</string>
-    <string name="in_attesa_del_collegamento">In attesa del collegamento</string>
+    <string name="Connetti_il_cavo_usb">Connetti il cavo usb al device...</string>
     <string name="huawei">Huawei</string>
     <string name="vendor_card">Vendor</string>
     <string name="model_card">Model</string>
     <string name="ar_19_15">AR 19-15</string>
-    <string name="men">Menù</string>
+    <string name="menu">Scegli quali azioni effettuare sul device</string>
     <string name="applica_firmware">Applica firmware</string>
     <string name="title_activity_main">MainActivity</string>
     <!-- Strings used for fragments for navigation -->

@@ -159,11 +159,8 @@ public class UsbService extends Service {
     }
 
     private void findSerialPortDevice() {
-        // This snippet will try to open the first encountered usb device connected, excluding usb root hubs
         HashMap<String, UsbDevice> usbDevices = usbManager.getDeviceList();
         if (!usbDevices.isEmpty()) {
-
-            // first, dump the hashmap for diagnostic purposes
             for (Map.Entry<String, UsbDevice> entry : usbDevices.entrySet()) {
                 device = entry.getValue();
                 Log.d(TAG, String.format("USBDevice.HashMap (vid:pid) (%X:%X)-%b class:%X:%X name:%s",
@@ -172,15 +169,11 @@ public class UsbService extends Service {
                         device.getDeviceClass(), device.getDeviceSubclass(),
                         device.getDeviceName()));
             }
-
             for (Map.Entry<String, UsbDevice> entry : usbDevices.entrySet()) {
                 device = entry.getValue();
                 int deviceVID = device.getVendorId();
                 int devicePID = device.getProductId();
-
-//                if (deviceVID != 0x1d6b && (devicePID != 0x0001 && devicePID != 0x0002 && devicePID != 0x0003) && deviceVID != 0x5c6 && devicePID != 0x904c) {
                 if (UsbSerialDevice.isSupported(device)) {
-                    // There is a supported device connected - request permission to access it.
                     requestUserPermission();
                     break;
                 } else {
@@ -189,13 +182,11 @@ public class UsbService extends Service {
                 }
             }
             if (device==null) {
-                // There are no USB devices connected (but usb host were listed). Send an intent to MainActivity.
                 Intent intent = new Intent(ACTION_NO_USB);
                 sendBroadcast(intent);
             }
         } else {
             Log.d(TAG, "findSerialPortDevice() usbManager returned empty device list." );
-            // There is no USB devices connected. Send an intent to MainActivity
             Intent intent = new Intent(ACTION_NO_USB);
             sendBroadcast(intent);
         }
@@ -210,8 +201,11 @@ public class UsbService extends Service {
     }
 
     private void requestUserPermission() {
-        Log.d(TAG, String.format("requestUserPermission(%X:%X)", device.getVendorId(), device.getProductId() ) );
-        PendingIntent mPendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
+        PendingIntent mPendingIntent = PendingIntent
+                .getBroadcast(this,
+                        0,
+                        new Intent(ACTION_USB_PERMISSION),
+                        0);
         usbManager.requestPermission(device, mPendingIntent);
     }
 
@@ -233,27 +227,14 @@ public class UsbService extends Service {
                     serialPort.setDataBits(UsbSerialInterface.DATA_BITS_8);
                     serialPort.setStopBits(UsbSerialInterface.STOP_BITS_1);
                     serialPort.setParity(UsbSerialInterface.PARITY_NONE);
-                    /**
-                     * Current flow control Options:
-                     * UsbSerialInterface.FLOW_CONTROL_OFF
-                     * UsbSerialInterface.FLOW_CONTROL_RTS_CTS only for CP2102 and FT232
-                     * UsbSerialInterface.FLOW_CONTROL_DSR_DTR only for CP2102 and FT232
-                     */
                     serialPort.setFlowControl(UsbSerialInterface.FLOW_CONTROL_OFF);
+
                     serialPort.read(mCallback);
                     serialPort.getCTS(ctsCallback);
                     serialPort.getDSR(dsrCallback);
-                    //
-                    // Some Arduinos would need some sleep because firmware wait some time to know whether a new sketch is going
-                    // to be uploaded or not
-                    //Thread.sleep(2000); // sleep some. YMMV with different chips.
-
-                    // Everything went as expected. Send an intent to MainActivity
                     Intent intent = new Intent(ACTION_USB_READY);
                     context.sendBroadcast(intent);
                 } else {
-                    // Serial port could not be opened, maybe an I/O error or if CDC driver was chosen, it does not really fit
-                    // Send an Intent to Main Activity
                     if (serialPort instanceof CDCSerialDevice) {
                         Intent intent = new Intent(ACTION_CDC_DRIVER_NOT_WORKING);
                         context.sendBroadcast(intent);
@@ -263,7 +244,6 @@ public class UsbService extends Service {
                     }
                 }
             } else {
-                // No driver for given device, even generic CDC driver could not be loaded
                 Intent intent = new Intent(ACTION_USB_NOT_SUPPORTED);
                 context.sendBroadcast(intent);
             }

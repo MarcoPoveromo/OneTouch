@@ -25,6 +25,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import java.lang.ref.WeakReference;
 
 public class CpeConsoleFragment extends Fragment {
@@ -35,7 +37,7 @@ public class CpeConsoleFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case UsbService.ACTION_USB_DISCONNECTED:
-                    Toast.makeText(context, "USB disconnected", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(getView(), "USB disconnected", Snackbar.LENGTH_LONG).show();
                     CpeWaitFragment nextFrag= new CpeWaitFragment();
                     getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, nextFrag, "CpeConsoleFragment")
@@ -121,7 +123,7 @@ public class CpeConsoleFragment extends Fragment {
             public void onClick(View v) {
                 String data = editText.getText().toString() + "\n";
                 editText.setText("");
-                if (usbService != null) { // if UsbService was correctly binded, Send data
+                if (usbService != null) {
                     usbService.write(data.getBytes());
                 }
             }
