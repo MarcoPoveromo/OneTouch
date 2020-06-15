@@ -40,10 +40,10 @@
 
     <ProgressBar
         android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyle"
         android:layout_width="68dp"
         android:layout_height="61dp"
         android:backgroundTint="@android:color/transparent"
+        android:indeterminateTint="#BCCBDDDF"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

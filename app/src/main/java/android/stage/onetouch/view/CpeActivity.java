@@ -22,6 +22,10 @@ public class CpeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cpe);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.drawable.helmet);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
+        getSupportActionBar().setSubtitle(R.string.app_subtitle);
         startService(UsbService.class, usbConnection, null);
     }
 

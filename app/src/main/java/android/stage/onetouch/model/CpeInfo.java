@@ -3,18 +3,18 @@ package android.stage.onetouch.model;
 import java.util.Objects;
 
 public class CpeInfo {
-    String vendorName;
-    String model;
-    String softwareVersion;
-    String osFamily;
-    String upTime;
-    String lastReboot;
-    String processor;
-    String configurationMemory; // [bytes]
-    String flashSize; // [bytes]
-    String hostName;
-    String deviceSerialNumber;
-    String deviceName;
+    private String vendorName;
+    private String model;
+    private String softwareVersion;
+    private String osFamily;
+    private String upTime;
+    private String lastReboot;
+    private String processor;
+    private String configurationMemory; // [bytes]
+    private String flashSize; // [bytes]
+    private String hostName;
+    private String deviceSerialNumber;
+    private String deviceName;
 
 
     public String getVendorName() {

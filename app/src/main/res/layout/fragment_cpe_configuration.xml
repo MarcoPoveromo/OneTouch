@@ -25,13 +25,13 @@
 
     <ProgressBar
         android:id="@+id/progressBar2"
-        style="?android:attr/progressBarStyle"
         android:layout_width="67dp"
         android:layout_height="60dp"
-        android:background="@color/colorPrimary"
+        android:background="@android:color/transparent"
         android:indeterminateBehavior="repeat"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        android:indeterminateTint="#BCCBDDDF"
         app:layout_constraintTop_toTopOf="@+id/textView" />
 </androidx.constraintlayout.widget.ConstraintLayout>
