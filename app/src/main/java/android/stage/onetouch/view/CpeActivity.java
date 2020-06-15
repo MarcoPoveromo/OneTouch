@@ -30,11 +30,11 @@ public class CpeActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName arg0, IBinder arg1) {
             usbService = ((UsbService.UsbBinder) arg1).getService();
             FragmentManager fm = getSupportFragmentManager();
-            Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+            Fragment fragment = fm.findFragmentById(R.id.fragment_container_main);
 
             if(fragment == null) {
                 fragment = new CpeWaitFragment();
-                fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
+                fm.beginTransaction().add(R.id.fragment_container_main, fragment).commit();
             }
         }
 

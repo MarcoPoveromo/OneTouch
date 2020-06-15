@@ -57,7 +57,7 @@ public class CpeWaitFragment extends Fragment {
                     Snackbar.make(getView(), "CPE: Riconosciuto", Snackbar.LENGTH_SHORT).show();
                     CpeMenuFragment nextFrag= new CpeMenuFragment();
                     getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, nextFrag, "CpeWaitFragment")
+                            .replace(R.id.fragment_container_main, nextFrag, "CpeWaitFragment")
                             .addToBackStack(null)
                             .commit();
                     break;

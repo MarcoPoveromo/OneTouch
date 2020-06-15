@@ -31,7 +31,7 @@ public class CpeMenuFragment extends Fragment {
                     Snackbar.make(getView(), "USB disconnected", Snackbar.LENGTH_LONG).show();
                     CpeWaitFragment nextFrag= new CpeWaitFragment();
                     getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, nextFrag, "CpeMenuFragment")
+                            .replace(R.id.fragment_container_main, nextFrag, "CpeMenuFragment")
                             .addToBackStack(null)
                             .commit();
                     break;
@@ -79,7 +79,7 @@ public class CpeMenuFragment extends Fragment {
             public void onClick(View v) {
                 CpeConsoleFragment nextFrag= new CpeConsoleFragment();
                 getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, nextFrag, "CpeMenuFragment")
+                        .replace(R.id.fragment_container_main, nextFrag, "CpeMenuFragment")
                         .addToBackStack(null)
                         .commit();
             }
@@ -90,7 +90,7 @@ public class CpeMenuFragment extends Fragment {
             public void onClick(View v) {
                 CpeConfigurationFragment nextFrag= new CpeConfigurationFragment();
                 getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, nextFrag, "CpeMenuFragment")
+                        .replace(R.id.fragment_container_main, nextFrag, "CpeMenuFragment")
                         .addToBackStack(null)
                         .commit();
             }

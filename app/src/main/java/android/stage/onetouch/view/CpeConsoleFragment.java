@@ -40,7 +40,7 @@ public class CpeConsoleFragment extends Fragment {
                     Snackbar.make(getView(), "USB disconnected", Snackbar.LENGTH_LONG).show();
                     CpeWaitFragment nextFrag= new CpeWaitFragment();
                     getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, nextFrag, "CpeConsoleFragment")
+                            .replace(R.id.fragment_container_main, nextFrag, "CpeConsoleFragment")
                             .addToBackStack(null)
                             .commit();
                     break;
