@@ -75,6 +75,7 @@ public class CpeWaitFragment extends Fragment {
 
     private void cpeFingerprint() {
         CpeInfo cpeInfo = new CpeInfo();
+
         for(int i = 0; i < 2; i++)
             usbService.write(NEWLINE);
         try {
