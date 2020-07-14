@@ -23,9 +23,13 @@ import android.widget.Toast;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CpeConfigurationFragment extends Fragment {
     private static final String NEWLINE = "\n";
+
+    private List<String> commands = new ArrayList<>();
 
     private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         @Override
@@ -83,7 +87,7 @@ public class CpeConfigurationFragment extends Fragment {
         super.onResume();
         setFilters();
         usbService = ((CpeActivity) getActivity()).getUsbService();
-        applicaConfigurazione();
+        applyConfiguration();
     }
 
     @Override
@@ -103,17 +107,29 @@ public class CpeConfigurationFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_cpe_configuration, container, false);
         mHandler = new CpeConfigurationFragment.MyHandler(CpeConfigurationFragment.this);
         ((CpeActivity) getActivity()).setServiceHandler(mHandler);
-
+        retriveCommands();
         display = (TextView) v.findViewById(R.id.textView);
         return v;
     }
 
-    private void applicaConfigurazione(){
-          usbService.write("system-view" + NEWLINE);
-          usbService.write("user-interface aux 0" + NEWLINE);
-          usbService.write("screen-length 0" + NEWLINE);
-          usbService.write("display version" + NEWLINE);
-          usbService.write("display cpu" + NEWLINE);
-          usbService.write("display current-configuration" + NEWLINE);
+    private void retriveCommands() {
+        commands.add("system-view");
+        commands.add("user-interface aux 0");
+        commands.add("screen-length 0");
+        commands.add("sysname tesiTriennale");
+        commands.add("clock timezone 1 add 3:00:00");
+        commands.add("header login information Tesi di laurea triennale i");
+        commands.add("interface ethernet0/0");
+        commands.add("port link-mode route");
+        commands.add("description PROVA_TESI");
+        commands.add("ip address 10.100.130.2 255.255.0.0");
+        commands.add("dns server 140.3.255.254");
+        commands.add("display version");
+        commands.add("display cpu");
+    }
+
+    private void applyConfiguration(){
+          for(String command: commands)
+              usbService.write(command + NEWLINE);
     }
 }

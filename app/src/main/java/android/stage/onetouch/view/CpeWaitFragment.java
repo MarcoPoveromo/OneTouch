@@ -28,7 +28,13 @@ import java.util.regex.Pattern;
 
 
 public class CpeWaitFragment extends Fragment {
+
     private static final String NEWLINE = "\n";
+    private UsbService usbService;
+    private CpeWaitFragment.MyHandler mHandler;
+    private String lastOutput;
+    private CpeInfo expectedCpe;
+    private CpeInfo connectedCpe;
 
     private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         @Override
@@ -42,7 +48,11 @@ public class CpeWaitFragment extends Fragment {
                     break;
                 case UsbService.ACTION_USB_READY:
                     Snackbar.make(getView(), "USB: Connessione al dispositivo riuscita", Snackbar.LENGTH_SHORT).show();
-                    new Thread(){@Override public void run(){cpeFingerprint();}}.start();
+                    new Thread(){@Override public void run(){
+                        sendNewLine();
+                        cpeFingerprint();
+                        checkCpeRecognised();
+                    }}.start();
                     break;
                 case UsbService.ACTION_NO_USB:
                     Snackbar.make(getView(), "USB: Nessun dispositivo connesso", Snackbar.LENGTH_SHORT).show();
@@ -67,62 +77,69 @@ public class CpeWaitFragment extends Fragment {
         }
     };
 
-    private UsbService usbService;
-    private CpeWaitFragment.MyHandler mHandler;
-
-    private CpeInfo mCpeInfo; // Questo è il cpe atteso, si vuole confrontare quello atteso con quello attuale
-    private String lastOutput;
+    private void checkCpeRecognised() {
+        if (connectedCpe.equals(expectedCpe)) {
+            Intent intent = new Intent(UsbService.FINGERPRINT_ACCEPT);
+            getActivity().sendBroadcast(intent);
+        } else {
+            Intent intent = new Intent(UsbService.FINGERPRINT_REJECT);
+            getActivity().sendBroadcast(intent);
+        }
+    }
 
     private void cpeFingerprint() {
-        CpeInfo cpeInfo = new CpeInfo();
+        if (isHuawei()) {
+            connectedCpe = getHuaweiInfo();
+        }else if(isCisco()){
+            // Retrive Cisco information
+        }else if(isJuniper()){
+            // Retrive Juniper information
+        }
+    }
 
-        for(int i = 0; i < 2; i++)
-            usbService.write(NEWLINE);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        lastOutput = "";
-        usbService.write("display version\n" + NEWLINE);
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        if(lastOutput.contains("Huawei")){
-            cpeInfo.setVendorName("Huawei");
-            Log.d("OneTouch", cpeInfo.getVendorName());
-            cpeInfo.setModel(searchModel("Quidway (.*?)\\s", lastOutput));
-            //searchSoftwareVersion("(.* Software, Version .*)", lastOutput);
-            //searchOsFamily("(.*) Software, Version .*", lastOutput);
-            //searchUpTime("uptime is (.*)",lastOutput);
-            //searchLastReboot("Last reboot (.*)", lastOutput);
-            //searchProcessor("CPU type: (.*)", lastOutput);
-            //searchConfigurationMemory("(.*?) bytes .* SDRAM Memory", lastOutput);
-            //searchFlashSize("(.*?) bytes Flash Memory", lastOutput);
-            lastOutput = "";
-        }
-            /*send("display device manuinfo" + NEWLINE);
+    private boolean isJuniper() {
+        return false;
+    }
+
+    private boolean isCisco() {
+        return false;
+    }
+
+    private CpeInfo getHuaweiInfo() {
+        CpeInfo cpeInfo = new CpeInfo();
+        cpeInfo.setVendorName("Huawei");
+        cpeInfo.setModel(searchModel("Quidway (.*?)\\s", lastOutput));
+        //searchSoftwareVersion("(.* Software, Version .*)", lastOutput);
+        //searchOsFamily("(.*) Software, Version .*", lastOutput);
+        //searchUpTime("uptime is (.*)",lastOutput);
+        //searchLastReboot("Last reboot (.*)", lastOutput);
+        //searchProcessor("CPU type: (.*)", lastOutput);
+        //searchConfigurationMemory("(.*?) bytes .* SDRAM Memory", lastOutput);
+        //searchFlashSize("(.*?) bytes Flash Memory", lastOutput);
+        /*send("display device manuinfo" + NEWLINE);
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             searchDeviceSerialNumber("DEVICE_SERIAL_NUMBER\\s+:\\s+(\\w+)", lastOutput);*/
+        lastOutput = "";
+        return cpeInfo;
+    }
 
-            //Questo è l'oggetto che dovrebbe arrivare dal database
-            mCpeInfo = new CpeInfo();
-            mCpeInfo.setVendorName("Huawei");
-            mCpeInfo.setModel("QUIDWAY AR1915 ");
+    private boolean isHuawei() {
+        usbService.write("display version\n" + NEWLINE);
+        sleep();
+        if(lastOutput.contains("Huawei"))
+            return true;
+        return false;
+    }
 
-            if(cpeInfo.equals(mCpeInfo)){
-                Intent intent = new Intent(UsbService.FINGERPRINT_ACCEPT);
-                getActivity().sendBroadcast(intent);
-            }else{
-                Intent intent = new Intent(UsbService.FINGERPRINT_REJECT);
-                getActivity().sendBroadcast(intent);
-            }
+    private void sendNewLine() {
+        for(int i = 0; i < 2; i++)
+            usbService.write(NEWLINE);
+        sleep();
+        lastOutput = "";
     }
 
     private String searchModel(String s, String lastOutput) {
@@ -181,7 +198,18 @@ public class CpeWaitFragment extends Fragment {
         View v = inflater.inflate(R.layout.cpe_wait_fragment, container, false);
         mHandler = new CpeWaitFragment.MyHandler(CpeWaitFragment.this);
         ((CpeActivity) getActivity()).setServiceHandler(mHandler);
+        expectedCpe = new CpeInfo();
+        expectedCpe.setVendorName("Huawei");
+        expectedCpe.setModel("QUIDWAY AR1915 ");
         return v;
+    }
+
+    private void sleep(){
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private static class MyHandler extends Handler {
@@ -207,4 +235,6 @@ public class CpeWaitFragment extends Fragment {
             }
         }
     }
+
+
 }
